@@ -1,4 +1,4 @@
-package Week_01;
+package Week_01.homework;
 
 public class Hello {
 
