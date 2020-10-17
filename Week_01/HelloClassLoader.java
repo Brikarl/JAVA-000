@@ -1,37 +1,36 @@
 package Week_01;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Base64;
 
+/**
+ * 课程 demo
+ */
 public class HelloClassLoader extends ClassLoader {
     public static void main(String[] args) {
         try {
-            Class<?> aClass = new HelloClassLoader().findClass("Hello");
-            Object obj = aClass.newInstance();
-            Method method = aClass.getMethod("hello");
-            method.invoke(obj);
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+            new HelloClassLoader().findClass("jvm.Hello").newInstance(); // 加载并初始化Hello类
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        File f = new File(this.getClass().getResource("./Hello.xlass").getPath());
-        int length = (int)f.length();
-        byte[] bytes = new byte[length];
-        try {
-            new FileInputStream(f).read(bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return super.findClass(name);
-        }
-        for (int i = 0; i < bytes.length; ++i) {
-            bytes[i] = (byte)(255 - bytes[i]);
-        }
+        String helloBase64 = "yv66vgAAADQAHwoABgARCQASABMIABQKABUAFgcAFwcAGAEABjxpbml0PgEAAygpVgEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2N" +
+                "hbFZhcmlhYmxlVGFibGUBAAR0aGlzAQALTGp2bS9IZWxsbzsBAAg8Y2xpbml0PgEAClNvdXJjZUZpbGUBAApIZWxsby5qYXZhDAAHAAgHABkMABoAGwEAGEhlb" +
+                "GxvIENsYXNzIEluaXRpYWxpemVkIQcAHAwAHQAeAQAJanZtL0hlbGxvAQAQamF2YS9sYW5nL09iamVjdAEAEGphdmEvbGFuZy9TeXN0ZW0BAANvdXQBABVMamF2" +
+                "YS9pby9QcmludFN0cmVhbTsBABNqYXZhL2lvL1ByaW50U3RyZWFtAQAHcHJpbnRsbgEAFShMamF2YS9sYW5nL1N0cmluZzspVgAhAAUABgAAAAAAAgABAAcACA" +
+                "ABAAkAAAAvAAEAAQAAAAUqtwABsQAAAAIACgAAAAYAAQAAAAMACwAAAAwAAQAAAAUADAANAAAACAAOAAgAAQAJAAAAJQACAAAAAAAJsgACEgO2AASxAAAAAQAK" +
+                "AAAACgACAAAABgAIAAcAAQAPAAAAAgAQ";
+        byte[] bytes = decode(helloBase64);
         return defineClass(name, bytes, 0, bytes.length);
+    }
+
+    public byte[] decode(String base64) {
+        return Base64.getDecoder().decode(base64);
     }
 }
