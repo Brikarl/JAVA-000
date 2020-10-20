@@ -47,3 +47,11 @@ AAgAAQAJAAAAJQACAAEAAAAJsgACEgO2AASxAAAAAQAKAAAACgACAAAABAAIAAUAAQAMAAAAAgAN
 ## Error:(11, 30) java: 找不到符号 符号:   类 Launcher 位置: 程序包 sun.misc
 
 将 JDK  11.0 改为 JDK 1.8
+
+## Error attaching to process: Windbg Error: GetModuleParameters failed! 
+
+使用  `java -jar xxx.jar` 命令启动 jar 包，使用 `jamp PID` 时出现上述错误，原因是 `jmap` 的路径与 `java` 路径不同，需要重装 JDK即可解决。
+
+> Taking Peter's comment above a little further, I found that, on Windows, you have to - run the jstack process as an administrator - use the same Java installation for jstack that was used to start the process you want to analyse.
+>
+> Trying to get a dump from a process running under Java 1.8.0_40-b26 amd64 using jstack from an installation of 1.8.0_111-b14 didn't work. Using jstack from 1.8.0_40-b26 amd64 did.

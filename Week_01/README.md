@@ -176,3 +176,33 @@ public static main([Ljava/lang/String;)V
 ### Java内存模型（JMM）
 
 方法中使用的原生数据类型和对象引用地址在栈上存储；对象、对象成员与类定义、静态变量在堆上。
+
+## 10.17 工具与 GC 策略
+
+###  JDK 内置命令行工具
+
+当默认配置 `java -jar xxx.jar` 时，显示堆栈信息如下：
+
+```powershell
+Heap Configuration:
+   MinHeapFreeRatio         = 0
+   MaxHeapFreeRatio         = 100
+   MaxHeapSize              = 2147483648 (2048.0MB) // 最大堆容量，默认是物理内存容量(8GB)的 1 / 4 
+   NewSize                  = 44564480 (42.5MB)  // 初始化新生代容量，默认是物理容量(8GB)的 1 / 64
+   MaxNewSize               = 715653120 (682.5MB) // 最大新生代容量，恰好是堆最大容量(2GB)的 1 / 3
+   OldSize                  = 89653248 (85.5MB)
+   NewRatio                 = 2 // 老年代 : 新生代 = 2 : 1
+   SurvivorRatio            = 8 // Eden : survivor = 8 : 1 : 1
+   MetaspaceSize            = 21807104 (20.796875MB)
+   CompressedClassSpaceSize = 1073741824 (1024.0MB)
+   MaxMetaspaceSize         = 17592186044415 MB
+   G1HeapRegionSize         = 0 (0.0MB)
+```
+
+### 垃圾回收器
+
+- ==JDK 1.8 及之前为**并行GC**，JDK9 之后为 **G1**。==
+- CMS GC 为**并发 GC**，即在垃圾回收的过程中，业务代码也会并发运行，不会 STW。而**并行 GC** 则是会 STW。
+- CMS GC 的  `MaxNewSize` 为 $64(64位机器)*4(并行线程数)*c(系数)$ 。
+- **并行垃圾收集器**适用于多核服务器，主要目标是增加吞吐量。**CMS GC** 的设计目标是避免在老年代垃圾收集时出现长时间的卡顿。**G1 GC**最主要的设计目标是：将STW停顿的时间和分布，变成可预期且可配置的。每次只处理一部分内存块。
+
