@@ -55,3 +55,41 @@ AAgAAQAJAAAAJQACAAEAAAAJsgACEgO2AASxAAAAAQAKAAAACgACAAAABAAIAAUAAQAMAAAAAgAN
 > Taking Peter's comment above a little further, I found that, on Windows, you have to - run the jstack process as an administrator - use the same Java installation for jstack that was used to start the process you want to analyse.
 >
 > Trying to get a dump from a process running under Java 1.8.0_40-b26 amd64 using jstack from an installation of 1.8.0_111-b14 didn't work. Using jstack from 1.8.0_40-b26 amd64 did.
+
+## java Hello 报错 错误: 找不到或无法加载主类
+
+### 问题描述
+
+代码片段
+
+```java
+package Week_02.demo;
+
+/**
+ * @Author: Yunkai Bo
+ * @Date: 2020/10/28 17:10
+ * @Version 1.0
+ */
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
+}
+```
+
+执行命令
+
+```powershell
+PS D:\JAVA-000\src\Week_02\demo> javac .\Hello.java
+PS D:\JAVA-000\src\Week_02\demo> java Hello
+错误: 找不到或无法加载主类 Hello
+PS D:\JAVA-000\src\Week_02\demo>
+```
+
+### 解决方案
+
+`java Hello`意思是说，让 JVM 的类加载器，去找一个叫 `Hello` 的类来加载。类加载器会去找路径。
+
+如果 本地文件结构是 `jvm01/Hello.class`
+
+那么需要用`java jvm01.Hello` 去运行，同样地 JVM 只认类的全限定名称，也就是**包名+类名**。
