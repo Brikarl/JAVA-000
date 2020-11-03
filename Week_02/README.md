@@ -26,8 +26,6 @@
 >
 > ——周志明「深入理解 Java 虚拟机」
 
-
-
 ### 关于测试代码 GCLogAnalysis
 
 代码示例
@@ -110,3 +108,26 @@ public class GCLogAnalysis {
 - 当然，我们也可以使用全局静态变量来缓存，用来模拟**内存泄漏**，以及进行堆内存Dump的试验和分析。
 - 加大每次生成的数组的大小，可以用来模拟**大对象/巨无霸**对象（大对象/巨无霸对象主要是G1中的概念，比如超过1MB的数组）。
 
+### 压测工具 SuperBenchmarker
+
+#### 安装
+
+在 Windows 系统安装如下：
+
+1. 安装**chocolatey**，一个类似 apt-get 的工具，用管理员身份运行如下代码：
+
+   ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+   ```
+
+2. 安装 **SuperBenchmarker**，运行如下代码：
+
+   ```powershell
+   cinst SuperBenchmarker
+   ```
+
+#### 操作命令如下
+
+```powershell
+sb -u URL -c 线程数 -N 时间
+```
