@@ -11,6 +11,7 @@ import java.net.Socket;
  * @Version 1.0
  */
 public class HttpServer02 {
+    /**使用多线程，其吞吐量为 1558.1**/
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(8802);
         while (true) {

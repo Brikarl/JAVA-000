@@ -11,6 +11,9 @@ import java.net.Socket;
  * @Version 1.0
  */
 public class HttpServer01 {
+    /**
+     * 单线程，串行执行，其吞吐量为 47.5，1s / 20ms ~= 50
+     **/
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(8801);
         while (true) {

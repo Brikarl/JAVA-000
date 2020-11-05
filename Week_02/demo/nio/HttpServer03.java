@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
  * @Version 1.0
  */
 public class HttpServer03 {
+    /**使用线程池，其吞吐量为 1570.2**/
     public static void main(String[] args) throws IOException {
         ExecutorService executorService = Executors.newFixedThreadPool(40);
         final ServerSocket serverSocket = new ServerSocket(8803);

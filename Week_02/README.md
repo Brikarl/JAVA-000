@@ -131,3 +131,19 @@ public class GCLogAnalysis {
 ```powershell
 sb -u URL -c 线程数 -N 时间
 ```
+
+## 10.24 NIO 模型与 Netty 入门
+
+### select/poll 的几大缺点：
+
+1. 每次调用 select，都需要把 fd 集合从用户态拷贝到内核态，这个开销在 fd 很多时会很大。
+2. 同时每次调用 select 都需要在内核遍历传递进来的所有 fd，这个开销在 fd 很多时也很大。（数据结构为链表）
+3. select 支持的文件描述符数量太小了，默认是1024。
+
+### epoll：
+
+1. 内核与用户空间共享一块内存
+2. 通过回调解决遍历问题（红黑树）
+3. fd 没有限制，可以支撑10万连接
+
+![](./pics/epoll.png)
