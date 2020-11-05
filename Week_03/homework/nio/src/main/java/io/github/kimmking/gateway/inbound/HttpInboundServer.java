@@ -33,14 +33,22 @@ public class HttpInboundServer {
 
         try {
             ServerBootstrap b = new ServerBootstrap();
+            //未建立TCP连接的最大数
             b.option(ChannelOption.SO_BACKLOG, 128)
+                    //  开启 Nagle 算法优化
                     .option(ChannelOption.TCP_NODELAY, true)
+                    // 设置为长连接
                     .option(ChannelOption.SO_KEEPALIVE, true)
+                    // 重用地址，一半 CLOSE_WAIT 是否可重用
                     .option(ChannelOption.SO_REUSEADDR, true)
+                    // 缓冲区
                     .option(ChannelOption.SO_RCVBUF, 32 * 1024)
                     .option(ChannelOption.SO_SNDBUF, 32 * 1024)
+                    // 重用端口
                     .option(EpollChannelOption.SO_REUSEPORT, true)
+                    // 对 worker 起作用
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    // 内存池
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 
             b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
