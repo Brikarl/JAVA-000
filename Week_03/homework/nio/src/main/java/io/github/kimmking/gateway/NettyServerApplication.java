@@ -1,6 +1,5 @@
 package io.github.kimmking.gateway;
 
-
 import io.github.kimmking.gateway.inbound.HttpInboundServer;
 
 public class NettyServerApplication {
@@ -9,9 +8,7 @@ public class NettyServerApplication {
     public final static String GATEWAY_VERSION = "1.0.0";
     
     public static void main(String[] args) {
-        // 代理地址为 8088 端口
         String proxyServer = System.getProperty("proxyServer","http://localhost:8088");
-        // 网关地址为 8888
         String proxyPort = System.getProperty("proxyPort","8888");
         
           //  http://localhost:8888/api/hello  ==> gateway API

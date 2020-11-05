@@ -8,16 +8,16 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpUtil;
-import okhttp3.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.concurrent.*;
@@ -27,13 +27,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public class OkhttpOutboundHandler {
-    private OkHttpClient OKhttpclient;
+
+    private OkHttpClient client;
     private ExecutorService proxyService;
     private String backendUrl;
 
-
-    public OkhttpOutboundHandler(String backendUrl) throws IOException {
-
+    public OkhttpOutboundHandler(String backendUrl) {
         this.backendUrl = backendUrl.endsWith("/") ? backendUrl.substring(0, backendUrl.length() - 1) : backendUrl;
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 1000;
@@ -43,19 +42,7 @@ public class OkhttpOutboundHandler {
                 keepAliveTime, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(queueSize),
                 new NamedThreadFactory("proxyService"), handler);
 
-        IOReactorConfig ioConfig = IOReactorConfig.custom()
-                .setConnectTimeout(1000)
-                .setSoTimeout(1000)
-                .setIoThreadCount(cores)
-                .setRcvBufSize(32 * 1024)
-                .build();
-
-        httpclient = HttpAsyncClients.custom().setMaxConnTotal(40)
-                .setMaxConnPerRoute(8)
-                .setDefaultIOReactorConfig(ioConfig)
-                .setKeepAliveStrategy((response, context) -> 6000)
-                .build();
-        httpclient.start();
+        client = new OkHttpClient();
     }
 
     public void handle(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx) {
@@ -64,55 +51,29 @@ public class OkhttpOutboundHandler {
     }
 
     private void fetchGet(final FullHttpRequest inbound, final ChannelHandlerContext ctx, final String url) {
-        final HttpGet httpGet = new HttpGet(url);
-        //httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
-        httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
-        OKhttpclient.execute(httpGet, new FutureCallback<HttpResponse>() {
-            @Override
-            public void completed(final HttpResponse endpointResponse) {
-                try {
-                    handleResponse(inbound, ctx, endpointResponse);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-
-                }
-            }
-
-            @Override
-            public void failed(final Exception ex) {
-                httpGet.abort();
-                ex.printStackTrace();
-            }
-
-            @Override
-            public void cancelled() {
-                httpGet.abort();
-            }
-        });
+        System.out.println(inbound.headers().get("nio"));
+        Request request = new Request.Builder()
+                .addHeader("Content-Type", "text/html")
+                .addHeader("charset", "UTF-8")
+                .addHeader("nio", inbound.headers().get("nio"))
+                .url(url)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            handleResponse(inbound, ctx, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void handleResponse(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, final HttpResponse endpointResponse) throws Exception {
+    private void handleResponse(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, final Response endpointResponse) throws Exception {
         FullHttpResponse response = null;
         try {
-//            String value = "hello,kimmking";
-//            response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(value.getBytes("UTF-8")));
-//            response.headers().set("Content-Type", "application/json");
-//            response.headers().setInt("Content-Length", response.content().readableBytes());
-
-
-            byte[] body = EntityUtils.toByteArray(endpointResponse.getEntity());
-//            System.out.println(new String(body));
-//            System.out.println(body.length);
+            byte[] body = endpointResponse.body().bytes();
 
             response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
             response.headers().set("Content-Type", "application/json");
-            response.headers().setInt("Content-Length", Integer.parseInt(endpointResponse.getFirstHeader("Content-Length").getValue()));
-
-//            for (Header e : endpointResponse.getAllHeaders()) {
-//                //response.headers().set(e.getName(),e.getValue());
-//                System.out.println(e.getName() + " => " + e.getValue());
-//            }
+            response.headers().setInt("Content-Length", Integer.parseInt(endpointResponse.header("Content-Length")));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,12 +84,10 @@ public class OkhttpOutboundHandler {
                 if (!HttpUtil.isKeepAlive(fullRequest)) {
                     ctx.write(response).addListener(ChannelFutureListener.CLOSE);
                 } else {
-                    //response.headers().set(CONNECTION, KEEP_ALIVE);
                     ctx.write(response);
                 }
             }
             ctx.flush();
-            //ctx.close();
         }
 
     }
@@ -137,8 +96,4 @@ public class OkhttpOutboundHandler {
         cause.printStackTrace();
         ctx.close();
     }
-
 }
-
-
-

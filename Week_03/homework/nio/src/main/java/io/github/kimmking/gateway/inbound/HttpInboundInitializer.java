@@ -6,8 +6,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
-import java.io.IOException;
-
 public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 	
 	private String proxyServer;
@@ -17,7 +15,7 @@ public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 	}
 	
 	@Override
-	public void initChannel(SocketChannel ch) throws IOException {
+	public void initChannel(SocketChannel ch) {
 		ChannelPipeline p = ch.pipeline();
 //		if (sslCtx != null) {
 //			p.addLast(sslCtx.newHandler(ch.alloc()));
