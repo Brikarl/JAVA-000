@@ -147,3 +147,14 @@ sb -u URL -c 线程数 -N 时间
 3. fd 没有限制，可以支撑10万连接
 
 ![](./pics/epoll.png)
+
+### Reactor
+
+IO 多路复用(IO multiplexing)，也称事件驱动 IO(event-driven IO)，就是在**单个线程**里同时监控多个套接字，通过select 或 poll 轮询所负责的所有socket，当某个 socket 有数据到达了，就通知用户进程。
+
+### Proactor
+
+用户进程发出系统调用后立即返回，内核等待数据准备完成，然后将数据拷贝到用户进程缓冲区，然后发
+送信号告诉用户进程 **IO 操作执行完毕**（与 SIGIO 相比，一个是发送信号告诉用户进程数据准备完毕，一个是 IO执行完毕）。
+
+![](./pics/Proactor.png)
