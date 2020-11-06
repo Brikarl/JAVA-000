@@ -17,6 +17,7 @@ public class Join {
             for (int i = 0; i < 100; i++) {
                 if (i == 20) {
                     try {
+//                        释放掉对应的锁
                         thread1.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();

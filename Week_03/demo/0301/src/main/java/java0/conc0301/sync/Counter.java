@@ -6,7 +6,8 @@ public class Counter {
     
     public static int B=10;
     
-    private volatile int sum = 0;
+    private int sum = 0;
+// 不加synchronized的话会出现抢占
     public synchronized void incr() {
         sum=sum+1;
     }
@@ -39,9 +40,10 @@ public class Counter {
         t1.start();
         t2.start();
         Thread.sleep(1000);
-//        while (Thread.activeCount()>2){//当前线程的线程组中的数量>2
-//            Thread.yield();
-//        }
+        // 可以判断线程是否执行结束，没有结束的话线程数永远大于 2
+        while (Thread.activeCount()>2){//当前线程的线程组中的数量>2
+            Thread.yield();
+        }
         System.out.println("multiple threads: " + counter2.getSum());
     
     

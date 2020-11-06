@@ -44,3 +44,52 @@ public class DaemonThread {
    - Thread#run() : 本线程调用
 2. - Thread.sleep: 释放 CPU
    - Object#wait : 释放锁
+
+### 常量与静态变量
+
+示例代码如下：
+
+```java
+public class Cref {
+    public static void main(String[] args) {
+        int x = 10;
+        int z = StaticFinal.A;
+        int y = StaticFinal.B;
+    }
+}
+
+class StaticFinal {
+    public static final int A = 10;
+    public static int B = 10;
+}
+```
+
+字节码如下：
+
+```java
+public static main([Ljava/lang/String;)V
+   L0
+    LINENUMBER 5 L0
+    BIPUSH 10
+    ISTORE 1
+   L1
+    LINENUMBER 6 L1
+    BIPUSH 10 // 常量为 10
+    ISTORE 2
+   L2
+    LINENUMBER 7 L2
+    GETSTATIC java0/conc0301/sync/StaticFinal.B : I
+    ISTORE 3
+   L3
+    LINENUMBER 8 L3
+    RETURN
+   L4
+    LOCALVARIABLE args [Ljava/lang/String; L0 L4 0
+    LOCALVARIABLE x I L1 L4 1
+    LOCALVARIABLE z I L2 L4 2
+    LOCALVARIABLE y I L3 L4 3
+    MAXSTACK = 1
+    MAXLOCALS = 4
+}
+```
+
