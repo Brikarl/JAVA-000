@@ -1,7 +1,7 @@
 package java0.conc0301;
 
 public class DaemonThread {
-    
+
     public static void main(String[] args) {
         Runnable task = new Runnable() {
             @Override
@@ -20,6 +20,6 @@ public class DaemonThread {
         thread.setDaemon(false);
         thread.start();
     }
-    
-    
+
+
 }
