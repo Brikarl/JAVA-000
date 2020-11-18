@@ -16,42 +16,42 @@ import javax.jms.Topic;
 
 @Configuration
 public class BeanConfig {
-    
+
     @Value("${spring.activemq.broker-url}")
     private String brokerUrl;
-    
+
     @Value("${spring.activemq.user}")
     private String username;
-    
+
     @Value("${spring.activemq.topic-name}")
     private String password;
-    
+
     @Value("${spring.activemq.queue-name}")
     private String queueName;
-    
+
     @Value("${spring.activemq.topic-name}")
     private String topicName;
-    
+
     @Bean(name = "queue")
     public Queue queue() {
         return new ActiveMQQueue(queueName);
     }
-    
+
     @Bean(name = "topic")
     public Topic topic() {
         return new ActiveMQTopic(topicName);
     }
-    
+
     @Bean
     public ConnectionFactory connectionFactory() {
         return new ActiveMQConnectionFactory(username, password, brokerUrl);
     }
-    
+
     @Bean
     public JmsMessagingTemplate jmsMessageTemplate() {
         return new JmsMessagingTemplate(connectionFactory());
     }
-    
+
     // 在Queue模式中，对消息的监听需要对containerFactory进行配置
     @Bean("queueListener")
     public JmsListenerContainerFactory<?> queueJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -60,7 +60,7 @@ public class BeanConfig {
         factory.setPubSubDomain(false);
         return factory;
     }
-    
+
     //在Topic模式中，对消息的监听需要对containerFactory进行配置
     @Bean("topicListener")
     public JmsListenerContainerFactory<?> topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
